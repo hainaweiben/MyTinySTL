@@ -56,6 +56,12 @@
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "files.associations": {
-    "xtr1common": "cpp"
+    "xtr1common": "cpp",
+    "cstddef": "cpp",
+    "cstdint": "cpp",
+    "cstdlib": "cpp",
+    "initializer_list": "cpp",
+    "type_traits": "cpp",
+    "xstddef": "cpp"
   }
 }
