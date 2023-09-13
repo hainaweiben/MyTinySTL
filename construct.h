@@ -67,6 +67,11 @@ void destroy(Ty* pointer)
 {
   destroy_one(pointer, std::is_trivially_destructible<Ty>{});
 }
+/*
+**std::is_trivially_destructible<Ty>{}: 这部分使用了 C++ 标准库中的 std::is_trivially_destructible 类型特性，
+**它用于在编译时检查类型 Ty 是否是可以被快速销毁的（trivially destructible）。如果 Ty 是 trivially destructible，
+**那么它的析构函数是一个空操作，不需要执行显式的析构操作。
+*/
 
 template <class ForwardIter>
 void destroy(ForwardIter first, ForwardIter last)
