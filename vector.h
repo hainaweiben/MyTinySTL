@@ -83,12 +83,62 @@ public:
     vector(size_type n, const value_type& value)
     { fill_init(n, value); }
 
+    template <class Iter, typename std::enable_if<
+     mystl::is_input_iterator<Iter>::value,int>::type = 0>
+    vector(Iter first, Iter last)
+    {
+        MYSTL_DEBUG(!(last<first));
+        range_init(first,last);
+    } 
+
+    vector(const vector& rhs)
+    {
+        range_init(rhs.begin_, rhs.end_);
+    }
+
+    vector(vector&& rhs) noexcept
+        :begin_(rhs.begin_),
+        end_(rhs.end_),
+        cap_(rhs.cap_)
+    {
+        rhs.begin_ = nullptr;
+        rhs.end_ = nullptr;
+        rhs.cap_ = nullptr;
+    }
+
+    vector(std::initializer_list<value_type> ilist)
+    {
+        range_init(ilist.begin(),ilist.end());
+    }
+
+    vector& operator=(const vector& rhs);
+    vector& operator=(vector&& rhs);
+
+    vector& operator=(std::initializer_list<value_type> ilist)
+    {
+        vector tmp(ilist.begin(), ilist.end());
+        swap(tmp);
+        return *this;
+    }
+
+    ~vector()
+    {
+        destroy_and_recover(begin_, end_, cap_ - begin_);
+        begin_ = end_ = cap_ =nullptr;    
+    };
+
+    public:
+
+        // 迭代器相关操作
+        
 
     private:
         // helper fuctions
 
         // initialize / destroy
         void try_init() noexcept;
+        
+        void init_space(size_type size, size_type cap);
 };
 /*************************************************************************/
 //  helper functions
@@ -109,6 +159,25 @@ void vector<T>::try_init() noexcept
         cap_   = nullptr;
     }
 }
+
+// init_space 函数
+template <class T>
+void vector<T>::init_space(size_type size, size_type cap)
+{
+    try
+    {   
+        begin_ = data_allocate(cap);
+        end_ = begin_ + size;
+        cap_ = begin_ + cap; 
+    }
+    catch(...)
+    {
+        begin_ = nullptr;
+        end_ = nullptr;
+        cap_ = nullptr;
+        throw;
+    }
+} 
 
 }//namespace mystl end
 #endif // !MYTINYSTL_VECTOR_H_
