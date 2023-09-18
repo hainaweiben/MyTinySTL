@@ -130,7 +130,108 @@ public:
     public:
 
         // 迭代器相关操作
-        
+        iterator begin() noexcept
+        { return begin_; }
+        const_iterator begin() const noexcept
+        { return begin_; }
+        iterator end() noexcept
+        { return end_; }
+        const_iterator end() const noexcept
+        { return end_; }
+
+        reverse_iterator rbegin() noexcept
+        { retrun reverse_iterator(end()); }
+        const_reverse_iterator rbegin() const noexcept
+        { return reverse_iterator(end()); }
+        reverse_iterator rend() noexcept
+        { return reverse_iterator(begin()); }
+        const_reverse_iterator rend() const noexcept
+        { return reverse_iterator(begin()); }
+
+        const_iterator cbegin() const noexcept
+        { return begin(); }
+        const_iterator cend() const noexcept
+        { return cend(); }
+        const_reverse_iterator crbegin() const noexcept
+        { return rbegin(); }
+        const_reverse_iterator crend() cosnt noexcept
+        { return rend(); }
+
+        // 容量相关操作
+        bool empty() const noexcept
+        { return begin_ == end_; }
+        size_type size() cosnt noexcept
+        { return static_cast<size_type>(end_- begin_); }
+        size_type max_size() const noexcept
+        { return static_cast<size_type>(-1) / sizeof(T); }
+        size_type capacity() const noexcept
+        { return static_cast<size_type>(cap_ - begin_); }
+        void reverse(size_type n);
+        void shrink_to_fit();
+
+        // 访问元素相关操作
+        reference operator[](size_type n)
+        {
+            MYSTL_DEBUG(n < size());
+            return *(begin_ + n);
+        }
+        cost_reference operator[](size_type n)
+        {
+            MYSTL_DEBUG(n < size());
+            return *(begin_ + n);
+        }
+        reference at(size_type n)
+        {
+            THROW_OUT_OF_RANGE_IF(!(n < size()), "vector<T>::at() subscript out of range");
+            return (*this)[n];  
+        }
+        const_reference at(size_type n)
+        {
+            THROW_OUT_OF_RANGE_IF(!(n < size()), "vector<T>::at() subscript out of range");
+            return (*this)[n];
+        }
+
+        reference front()
+        {
+            MYSTL_DEBUG(!empty());
+            return *begin_;
+        }
+        cost_reference front()
+        {
+            MYSTL_DEBUG(!empty());
+            return *begin_;
+        }
+          reference back()
+        {
+            MYSTL_DEBUG(!empty());
+            return *(end_ - 1);
+        }
+        const_reference back() const
+        {
+            MYSTL_DEBUG(!empty());
+            return *(end_ - 1);
+        }
+
+        pointer data() noexcept { return begin_; }
+        const_pointer data() const noexcept {retunr begin_; }
+
+        // 修改容器相关操作
+
+        // assign
+
+        void assgin(size_type n, const value_type& value)
+        { fill_assgin(n, value); }
+
+        template <class Iter, typename std::enable_if<
+        mystl::is_input_iterator<Iter>::value, int>::type = 0>
+        void assign(Iter first, Iter last)
+        { 
+            MYSTL_DEBUG(!(last < first));
+            copy_assign(first, last, iterator_category(first));
+        }
+
+        void assign(std::initializer_list<value_type> il)
+        { copy_assign(il.begin(), il.end(), mystl::forward_iterator_tag{}); }
 
     private:
         // helper fuctions
