@@ -233,6 +233,57 @@ public:
         void assign(std::initializer_list<value_type> il)
         { copy_assign(il.begin(), il.end(), mystl::forward_iterator_tag{}); }
 
+
+        // emplace / emplace_back
+
+        template <class... Args>
+        iterator emplace(const_iterator pos, Args&& ...args);
+
+        template <class... Args>
+        void emplace_back(Args&& ...args);
+
+        // push_back / pop_back
+
+        void push_back(const value_type& value);
+        void push_back(value_type&& value);
+        { emplace_back(mystl::move(value)); }
+
+        void pop_back();
+
+        // insert
+
+        iterator insert(const_iterator pos, const value_type& value);
+        iterator insert(const_iterator pos, value_type&& value)
+        { retrun emplace(pos, mystl::move(value)); }
+
+        iterator insert(const_iterator pos, size_type n, const value_type& value)
+        {
+            MYSTL_DEBUG(pos >= begin() && pos <= end());
+            return fill_insert(const_cast<iterator>(pos), n, value);
+        }
+
+        template <class Iter, typename std::enable_if<
+            mystl::is_input_iterator<Iter>::value, int>::type = 0>
+        void insert(const_iterator pos, Iter first, Iter last)
+        {
+            MYSTL_DEBUG(pos >= begin() && pos <= end() && !(last < first));
+            copy_insert(const_cast<iterator>(pos), first, last);
+        }
+
+        // erase / clear
+        iterator erase(const_iterator pos);
+        iterator erase(const_iterator first, const_iterator last);
+        void     clear() { erase(begin(), end()); }
+
+        // resize / reverse
+        void     resize(size_type new_size) { return resize(new_size, value_type()); }
+        void     resize(size_type new_size, const value_type& value);
+
+        void     reverse() { mystl::reverse(begin(), end()); }
+
+        // swap
+        void     swap(vector& rhs) noexcept;     
+
     private:
         // helper fuctions
 
@@ -240,6 +291,18 @@ public:
         void try_init() noexcept;
         
         void init_space(size_type size, size_type cap);
+
+        void fill_init(size_type n, const value_type& value);
+        template <class Iter>
+        void range_init(Iter first, Iter last);
+
+        void destroy_and_recover(iterator first, iterator last, size_type n);
+
+        // calculate the growth size
+        size_type get_new_cap(size_type add_size);
+
+        //assign
+        
 };
 /*************************************************************************/
 //  helper functions
